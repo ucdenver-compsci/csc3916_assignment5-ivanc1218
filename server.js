@@ -208,7 +208,7 @@ router.route('/movies')
                                   avgRating: { $avg: '$movieReviews.rating' }
                                 }
                             }      
-                        ],function(err, doc) {
+                        ], function(err, doc) {
                             if(err){
                                 console.log("Error encountered.");
                                 res.send(err);
@@ -220,7 +220,34 @@ router.route('/movies')
                         });
                     }
                     else{
-                        res.json(data);
+                        Movie.aggregate([
+                            {
+                                $match: {'_id': mongoose.Types.ObjectId(req.query.movieId)}
+                            },
+                            {
+                                $lookup:{
+                                    from: 'reviews',
+                                    localField: '_id',
+                                    foreignField: 'movieId',
+                                    as: 'movieReviews'
+                                }
+                            },
+                            {
+                                $addFields: {
+                                  avgRating: { $avg: '$movieReviews.rating' }
+                                }
+                            }      
+                        ], function(err, doc) {
+                            if(err){
+                                console.log("Error encountered.");
+                                res.send(err);
+                            }
+                            else{
+                                console.log(doc);
+                                res.json(doc);
+                            }
+                        });
+                        // res.json(data);
                     }
                 }
             });
