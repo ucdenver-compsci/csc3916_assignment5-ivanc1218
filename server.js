@@ -208,8 +208,7 @@ router.route('/movies')
                                   avgRating: { $avg: '$Reviews.rating' }
                                 }
                             }      
-                        ]);
-                        Movie.aggregate(aggregate).exec(function(err, doc) {
+                        ],function(err, doc) {
                             if(err){
                                 console.log("Error encountered.");
                                 res.send(err);
@@ -248,8 +247,7 @@ router.route('/movies')
                         },
                         {
                             $sort: { avgRating: -1 }
-                        }]);
-                        Movie.aggregate(aggregate).exec(function(err, data) {
+                        }], function(err, data) {
                             if(err){
                                 res.send(err);
                             }
