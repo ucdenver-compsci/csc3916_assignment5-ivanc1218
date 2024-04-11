@@ -124,7 +124,7 @@ router.all('/signin', (req, res) => {
 router.route('/movies/:title')
     .get(authJwtController.isAuthenticated, function (req, res) {
         Movie.findOne({title: req.params.title}, function(err, data) {
-            if (err || data.length == 0) {
+            if (err || !data) {
                 res.json({status: 400, message: "Movie ''" + req.params.title + "'' couldn't be found."})
             }
             else {
@@ -220,34 +220,7 @@ router.route('/movies')
                         });
                     }
                     else{
-                        Movie.aggregate([
-                            {
-                                $match: {'_id': mongoose.Types.ObjectId(req.query.movieId)}
-                            },
-                            {
-                                $lookup:{
-                                    from: 'reviews',
-                                    localField: '_id',
-                                    foreignField: 'movieId',
-                                    as: 'movieReviews'
-                                }
-                            },
-                            {
-                                $addFields: {
-                                  avgRating: { $avg: '$movieReviews.rating' }
-                                }
-                            }      
-                        ], function(err, doc) {
-                            if(err){
-                                console.log("Error encountered.");
-                                res.send(err);
-                            }
-                            else{
-                                console.log(doc);
-                                res.json(doc);
-                            }
-                        });
-                        // res.json(data);
+                        res.json(data);
                     }
                 }
             });
