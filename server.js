@@ -145,7 +145,7 @@ router.route('/movies/:title')
                 genre: req.body.genre,
                 actors: req.body.actors,
                 imageURL: req.body.imageURL,
-                averageRating: req.body.averageRating
+                avgRating: req.body.avgRating
             },
             { new: true },
             function(err, doc) {
@@ -350,7 +350,7 @@ router.route('/reviews')
                                 avg = avg / allReviews.length;
 
 
-                                Movie.findOneAndUpdate({_id: req.body.Movie_ID},  {$set: { averageRating: avg} }, function (err, doc){
+                                Movie.findOneAndUpdate({_id: req.body.Movie_ID},  {$set: { avgRating: avg} }, function (err, doc){
                                 if (err){
                                     res.json({error: err});
                                 }
