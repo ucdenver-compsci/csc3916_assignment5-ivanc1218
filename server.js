@@ -143,7 +143,9 @@ router.route('/movies/:title')
                 title: req.body.title,
                 releaseDate: req.body.releaseDate,
                 genre: req.body.genre,
-                actors: req.body.actors 
+                actors: req.body.actors,
+                imageURL: req.body.imageURL,
+                averageRating: req.body.averageRating
             },
             { new: true },
             function(err, doc) {
@@ -202,7 +204,13 @@ router.route('/movies')
                                     foreignField: 'movieId',
                                     as: 'Reviews'
                                 }
-                            }],function(err, doc) {
+                            },
+                            {
+                                $addFields: {
+                                  avgRating: { $avg: '$Reviews.rating' }
+                                }
+                            }      
+                        ],function(err, doc) {
                             if(err){
                                 console.log("Error encountered.");
                                 res.send(err);
@@ -233,6 +241,14 @@ router.route('/movies')
                                 foreignField: 'movieId',
                                 as: 'Reviews'
                             }
+                        },
+                        {
+                            $addFields: {
+                            avgRating: { $avg: '$movieReviews.rating' }
+                            }
+                        },
+                        {
+                            $sort: { avgRating: -1 }
                         }], function(err, data) {
                             if(err){
                                 res.send(err);
@@ -252,10 +268,10 @@ router.route('/movies')
     
     .post(authJwtController.isAuthenticated, function(req, res) {
         Movie.findOne({title: req.body.title}, function(err) {
-            if (err) {
+            if(err){
                 res.status(400);
             }
-            else if (req.body.actors.length < 3) {
+            else if(req.body.actors.length < 3){
                 res.json({message: "Not enough actors. (You need at least 3)"});
             }
             else {
@@ -264,10 +280,11 @@ router.route('/movies')
                 newMovie.releaseDate = req.body.releaseDate;
                 newMovie.genre = req.body.genre;
                 newMovie.actors = req.body.actors;
+                newMovie.imageURL = req.body.imageURL;
                 
                 newMovie.save(function (err) {
                     if (err) {
-                    res.json({message: err});
+                        res.json({message: err});
                     }
                     else {
                         res.json({status: 200, success: true, message: "" + req.body.title + " SAVED"});
@@ -324,13 +341,23 @@ router.route('/reviews')
                                 res.status(400).json({message: "Error encountered."});
                             }
                             else{
+                                var avg = 0;
+
+                                allReviews.forEach(function(review) {
+                                    avg += review.Rating;
+                                    console.log(review);
+                                });
+                                avg = avg / allReviews.length;
+
+
+                                Movie.findOneAndUpdate({_id: req.body.Movie_ID},  {$set: { averageRating: avg} }, function (err, doc){
                                 if (err){
                                     res.json({error: err});
                                 }
                                 else if(rev.content != null){
                                     res.json({msg: "Review successfully saved!"});
                                 }
-                            }
+                            })}
                         });
                     }
                 });

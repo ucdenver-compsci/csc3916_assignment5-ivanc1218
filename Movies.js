@@ -6,7 +6,7 @@ mongoose.connect(process.env.DB);
 // Movie schema
 const MovieSchema = new mongoose.Schema({
     title: { type: String, required: true, index: true },
-    releaseDate: Date,
+    releaseDate: { type: Number, min: [1900, 'Must be greater than 1899'], max: [2100, 'Must be less than 2100']},
     genre: {
       type: String,
       enum: [
@@ -17,6 +17,8 @@ const MovieSchema = new mongoose.Schema({
       actorName: String,
       characterName: String,
     }],
+    imageUrl: String,
+    averageRating: {type:Number, required: false}
 });
 
 // return the model
