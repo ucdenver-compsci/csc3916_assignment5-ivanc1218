@@ -143,9 +143,7 @@ router.route('/movies/:title')
                 title: req.body.title,
                 releaseDate: req.body.releaseDate,
                 genre: req.body.genre,
-                actors: req.body.actors,
-                imageURL: req.body.imageURL,
-                avgRating: req.body.avgRating
+                actors: req.body.actors
             },
             { new: true },
             function(err, doc) {
