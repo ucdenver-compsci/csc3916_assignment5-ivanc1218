@@ -121,14 +121,14 @@ router.all('/signin', (req, res) => {
     res.status(405).send({ message: 'HTTP method not supported.' });
 });
 
-router.route('/movies/:title')
+router.route('/movies/:idofmovie')
     .get(authJwtController.isAuthenticated, function (req, res) {
-        Movie.findOne({title: req.params.title}, function(err, data) {
+        Movie.findOne({idofmovie: req.params._id}, function(err, data) {
             if (err || !data) {
-                res.json({status: 400, message: "Movie ''" + req.params.title + "'' couldn't be found."})
+                res.json({status: 400, message: "Movie ''" + req.params._id + "'' couldn't be found."})
             }
             else {
-                res.json({status: 200, message: "" + req.params.title + " was found!", movie: data});
+                res.json({status: 200, message: "" + req.params._id + " was found!", movie: data});
 
                 Movie.aggregate([
                     {
