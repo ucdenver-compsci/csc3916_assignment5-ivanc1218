@@ -321,8 +321,8 @@ router.route('/reviews')
             }
             else if (data != null){
                 let rev = new Review({
-                    Name: decoded.username,
-                    content: req.body.content,
+                    username: decoded.username,
+                    review: req.body.review,
                     rating: req.body.rating,
                     movieId: req.body.movieId
                 });
@@ -348,11 +348,11 @@ router.route('/reviews')
                                 avg = avg / allReviews.length;
 
 
-                                Movie.findOneAndUpdate({_id: req.body.Movie_ID},  {$set: { avgRating: avg} }, function (err, doc){
+                                Movie.findOneAndUpdate({_id: req.body.movieId},  {$set: { avgRating: avg} }, function (err, doc){
                                 if (err){
                                     res.json({error: err});
                                 }
-                                else if(rev.content != null){
+                                else if(rev.review != null){
                                     res.json({msg: "Review successfully saved!"});
                                 }
                             })}
@@ -367,12 +367,12 @@ router.route('/reviews')
     })
 
     .get(authJwtController.isAuthenticated, function (req, res) {
-        Review.find({}, 'content', function(err, data) {
+        Review.find({}, 'review', function(err, data) {
             if (err || data.length == 0) {
                 res.json({status: 400, message: "No reviews found."})
             }
             else {
-                const allReviews = data.map(review => review.content);
+                const allReviews = data.map(review => review.review);
                 res.json({status: 200, message: "REVIEWS", reviews: allReviews});
             }
         })
