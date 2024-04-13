@@ -123,40 +123,12 @@ router.all('/signin', (req, res) => {
 
 router.route('/movies/:idofmovie')
     .get(authJwtController.isAuthenticated, function (req, res) {
-        Movie.findOne({idofmovie: req.params._id}, function(err, data) {
+        Movie.findOne({idofmovie: req.params.movieId}, function(err, data) {
             if (err || !data) {
-                res.json({status: 400, message: "Movie ''" + req.params._id + "'' couldn't be found."})
+                res.json({status: 400, message: "Movie ''" + data.title + "'' couldn't be found."})
             }
             else {
-                res.json({status: 200, message: "" + req.params._id + " was found!", movie: data});
-
-                Movie.aggregate([
-                    {
-                        $match: {'_id': mongoose.Types.ObjectId(req.query.movieId)}
-                    },
-                    {
-                        $lookup:{
-                            from: 'reviews',
-                            localField: '_id',
-                            foreignField: 'movieId',
-                            as: 'movieReviews'
-                        }
-                    },
-                    {
-                        $addFields: {
-                          avgRating: { $avg: '$movieReviews.rating' }
-                        }
-                    }      
-                ], function(err, doc) {
-                    if(err){
-                        console.log("Error encountered.");
-                        res.send(err);
-                    }
-                    else{
-                        console.log(doc);
-                        res.json(doc);
-                    }
-                });
+                res.json({status: 200, message: "" + data.title + " was found!", movie: data});
             }
         })
     })
@@ -166,36 +138,35 @@ router.route('/movies/:idofmovie')
     })
 
     .put(authJwtController.isAuthenticated,function(req, res) {
-        Movie.findOneAndUpdate(
-            {title: req.params.title}, { 
+        Movie.findOneAndUpdate({idofmovie: req.params.movieId}, { 
                 title: req.body.title,
                 releaseDate: req.body.releaseDate,
                 genre: req.body.genre,
                 actors: req.body.actors
             },
             { new: true },
-            function(err, doc) {
+            function(err, data) {
                 if (err) {
                     res.json({ message: "Movie could not be updated." });
                 }
-                else if (!doc) {
+                else if (!data) {
                     res.json({ message: "Movie not found." });
                 }
                 else {
-                    res.json({ status: 200, message: "" + req.body.title + " UPDATED"});
+                    res.json({ status: 200, message: "" + data.title + " UPDATED"});
                 }
             }
         );
     })
 
     .delete(authJwtController.isAuthenticated, function(req, res) {
-        Movie.findOneAndDelete({title: req.params.title}, function(err, data) {
+        Movie.findOneAndDelete({idofmovie: req.params.movieId}, function(err, data) {
             if (err || data.length == 0) {
                 res.json(err);
                 res.json({message: "There was an issue trying to find your movie"})
             }
             else {
-                res.json({message: "" + req.params.title + " DELETED"});
+                res.json({message: "" + data.title + " DELETED"});
             }
         })
     })

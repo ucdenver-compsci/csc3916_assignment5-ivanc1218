@@ -17,8 +17,7 @@ const MovieSchema = new mongoose.Schema({
       actorName: String,
       characterName: String,
     }],
-    imageUrl: {type: String},
-    avgRating: {type:Number, required: false}
+    imageUrl: {type: String}
 });
 
 // return the model
