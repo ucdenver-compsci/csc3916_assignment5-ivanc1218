@@ -123,15 +123,16 @@ router.all('/signin', (req, res) => {
 
 router.route('/movies/:idofmovie')
     .get(authJwtController.isAuthenticated, function (req, res) {
-        Movie.findOne({idofmovie: req.params.movieId}, function(err, data) {
+        Movie.findOne({idofmovie: req.params._id}, function(err, data) {
             if (err || !data) {
                 res.json({status: 400, message: "Movie ''" + data.title + "'' couldn't be found."})
             }
             else {
                 res.json({status: 200, message: "" + data.title + " was found!", movie: data});
+
                 Movie.aggregate([
                     {
-                        $match: {'_id': mongoose.Types.ObjectId(req.query.movieId)}
+                        $match: {'_id': mongoose.Types.ObjectId(req.query.idofmovie)}
                     },
                     {
                         $lookup:{
@@ -155,7 +156,7 @@ router.route('/movies/:idofmovie')
                         console.log(doc);
                         res.json(doc);
                     }
-                })
+                });
             }
         })
     })
