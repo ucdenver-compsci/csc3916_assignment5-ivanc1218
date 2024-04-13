@@ -147,14 +147,14 @@ router.route('/movies/:idofmovie')
                           avgRating: { $avg: '$movieReviews.rating' }
                         }
                     }      
-                ], function(err, doc) {
+                ], function(err, data) {
                     if(err){
                         console.log("Error encountered.");
                         res.send(err);
                     }
                     else{
-                        console.log(doc);
-                        res.json(doc);
+                        console.log(data);
+                        res.json(data);
                     }
                 });
             }
