@@ -128,38 +128,24 @@ router.route('/movies/:idofmovie')
                 res.json({status: 400, message: "Movie ''" + data.title + "'' couldn't be found."})
             }
             else {
-                res.json({status: 200, message: "" + data.title + " was found!", movie: data});
+                const responseData = {status: 200, message: "" + data.title + " was found!", movie: data};
 
                 Movie.aggregate([
-                    {
-                        $match: {'_id': mongoose.Types.ObjectId(req.query.idofmovie)}
-                    },
-                    {
-                        $lookup:{
-                            from: 'reviews',
-                            localField: '_id',
-                            foreignField: 'movieId',
-                            as: 'movieReviews'
-                        }
-                    },
-                    {
-                        $addFields: {
-                          avgRating: { $avg: '$movieReviews.rating' }
-                        }
-                    }      
-                ], function(err, data) {
+                ], function(err, aggregatedData) {
                     if(err){
                         console.log("Error encountered.");
                         res.send(err);
                     }
                     else{
-                        console.log(data);
-                        res.json(data);
+                        console.log(aggregatedData);
+                        responseData.aggregatedData = aggregatedData;
+                        res.json(responseData);
                     }
                 });
             }
         })
     })
+
 
     .post(authJwtController.isAuthenticated, (req, res) => {
         res.json({status: 400, message: "Invalid action."})
