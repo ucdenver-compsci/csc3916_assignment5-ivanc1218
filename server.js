@@ -123,29 +123,44 @@ router.all('/signin', (req, res) => {
 
 router.route('/movies/:idofmovie')
     .get(authJwtController.isAuthenticated, function (req, res) {
-        Movie.findOne({idofmovie: req.params._id}, function(err, data) {
+        Movie.findOne({_id: req.params.idofmovie}, function(err, data) {
             if (err || !data) {
                 res.json({status: 400, message: "Movie ''" + data.title + "'' couldn't be found."})
             }
             else {
-                const responseData = {status: 200, message: "" + data.title + " was found!", movie: data};
+                res.json({status: 200, message: "" + data.title + " was found!", movie: data});
 
                 Movie.aggregate([
-                ], function(err, aggregatedData) {
+                    {
+                        $match: { _id: req.params.idofmovie }
+                    },
+                    {
+                        $lookup:{
+                            from: 'reviews',
+                            localField: '_id',
+                            foreignField: 'movieId',
+                            as: 'movieReviews'
+                        }
+                    },
+                    {
+                        $addFields: {
+                          avgRating: { $avg: '$movieReviews.rating' }
+                        }
+                    },   
+                    // console.log(data),
+                ], function(err, data) {
                     if(err){
                         console.log("Error encountered.");
                         res.send(err);
                     }
                     else{
-                        console.log(aggregatedData);
-                        responseData.aggregatedData = aggregatedData;
-                        res.json(responseData);
+                        // console.log(data);
+                        // res.json(data);
                     }
                 });
             }
         })
     })
-
 
     .post(authJwtController.isAuthenticated, (req, res) => {
         res.json({status: 400, message: "Invalid action."})
