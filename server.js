@@ -144,7 +144,8 @@ router.route('/movies/:idofmovie')
                     },
                     {
                         $addFields: {
-                          avgRating: { $avg: '$movieReviews.rating' }
+                          avgRating: { $avg: '$movieReviews.rating' },
+                          reviews:  { $push: '$movieReviews.review' }
                         }
                     },   
                     // console.log(data),
