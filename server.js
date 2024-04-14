@@ -210,7 +210,7 @@ router.route('/movies/:idofmovie')
 router.route('/movies')
     .get(authJwtController.isAuthenticated, function (req, res) {
         if(req.query.movieId != null){
-            Movie.find({_id: mongoose.Types.ObjectId(req.query.movieId)}, 'title', function(err, data) {
+            Movie.find({_id: mongoose.Types.ObjectId(req.query.movieId)}, '_id', function(err, data) {
                 if (err || data.length == 0) {
                     res.json({status: 400, message: "No movies found."})
                 }
