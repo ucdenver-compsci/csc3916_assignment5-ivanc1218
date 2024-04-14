@@ -139,13 +139,12 @@ router.route('/movies/:idofmovie')
                             from: 'reviews',
                             localField: '_id',
                             foreignField: 'movieId',
-                            as: 'movieReviews'
+                            as: 'reviews'
                         }
                     },
                     {
                         $addFields: {
-                          avgRating: { $avg: '$movieReviews.rating' },
-                          reviews:  { $push: '$movieReviews.review' }
+                          avgRating: { $avg: '$reviews.rating' },
                         }
                     },   
                     // console.log(data),
@@ -229,12 +228,12 @@ router.route('/movies')
                                     from: 'reviews',
                                     localField: '_id',
                                     foreignField: 'movieId',
-                                    as: 'movieReviews'
+                                    as: 'reviews'
                                 }
                             },
                             {
                                 $addFields: {
-                                  avgRating: { $avg: '$movieReviews.rating' }
+                                  avgRating: { $avg: '$reviews.rating' }
                                 }
                             }      
                         ], function(err, doc) {
@@ -266,12 +265,12 @@ router.route('/movies')
                                 from: 'reviews',
                                 localField: '_id',
                                 foreignField: 'movieId',
-                                as: 'movieReviews'
+                                as: 'reviews'
                             }
                         },
                         {
                             $addFields: {
-                            avgRating: { $avg: '$movieReviews.rating' }
+                            avgRating: { $avg: '$reviews.rating' }
                             }
                         },
                         {
