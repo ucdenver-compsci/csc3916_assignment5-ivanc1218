@@ -128,36 +128,44 @@ router.route('/movies/:idofmovie')
                 res.json({status: 400, message: "Movie ''" + data.title + "'' couldn't be found."})
             }
             else {
-                res.json({status: 200, message: "" + data.title + " was found!", movie: data});
-
-                Movie.aggregate([
-                    {
-                        $match: {'_id': mongoose.Types.ObjectId(req.params.idofmovie)}
-                    },
-                    {
-                        $lookup:{
-                            from: 'reviews',
-                            localField: '_id',
-                            foreignField: 'movieId',
-                            as: 'reviews'
+                if(req.query.reviews == "true" || req.query.reviews == "True"){
+                    Movie.aggregate([
+                        {
+                            $match: {'_id': mongoose.Types.ObjectId(req.params.idofmovie)}
+                        },
+                        {
+                            $lookup:{
+                                from: 'reviews',
+                                localField: '_id',
+                                foreignField: 'movieId',
+                                as: 'reviews'
+                            }
+                        },
+                        {
+                            $addFields: {
+                                avgRating: { $avg: '$reviews.rating' },
+                            }
+                        },   
+                        // console.log(data),
+                    ], function(err, data) {
+                        if(err){
+                            console.log("Error encountered.");
+                            res.send(err);
                         }
-                    },
-                    {
-                        $addFields: {
-                          avgRating: { $avg: '$reviews.rating' },
+                        else{
+                            res.json({status: 200, message: "Movie was found!", movie: data});
                         }
-                    },   
-                    // console.log(data),
-                ], function(err, data) {
+                    });
+                }
+                else{
                     if(err){
                         console.log("Error encountered.");
                         res.send(err);
                     }
                     else{
-                        // console.log(data);
-                        // res.json(data);
+                        res.json({status: 200, message: "Movie was found!", movie: data});
                     }
-                });
+                }
             }
         })
     })
