@@ -132,7 +132,7 @@ router.route('/movies/:idofmovie')
 
                 Movie.aggregate([
                     {
-                        $match: { _id: req.params.idofmovie }
+                        $match: {'_id': mongoose.Types.ObjectId(req.params.id)}
                     },
                     {
                         $lookup:{
