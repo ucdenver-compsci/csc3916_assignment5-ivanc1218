@@ -125,7 +125,7 @@ router.route('/movies/:idofmovie')
     .get(authJwtController.isAuthenticated, function (req, res) {
         Movie.findOne({_id: req.params.idofmovie}, function(err, data) {
             if (err || !data) {
-                res.json({status: 400, message: "Movie ''" + data.title + "'' couldn't be found."})
+                res.json({status: 400, message: "Movie couldn't be found."})
             }
             else {
                 if(req.query.reviews == "true" || req.query.reviews == "True"){
@@ -146,14 +146,13 @@ router.route('/movies/:idofmovie')
                                 avgRating: { $avg: '$reviews.rating' },
                             }
                         },   
-                        // console.log(data),
                     ], function(err, data) {
                         if(err){
                             console.log("Error encountered.");
                             res.send(err);
                         }
                         else{
-                            res.json({status: 200, message: "Movie was found!", movie: data});
+                            res.json({status: 200, message: "Movie was found!", movie: data, Movie});
                         }
                     });
                 }
@@ -163,7 +162,7 @@ router.route('/movies/:idofmovie')
                         res.send(err);
                     }
                     else{
-                        res.json({status: 200, message: "Movie was found!", movie: data});
+                        res.json({status: 200, message: "Movie was found!", movie: data, Movie});
                     }
                 }
             }
@@ -244,14 +243,14 @@ router.route('/movies')
                                   avgRating: { $avg: '$reviews.rating' }
                                 }
                             }      
-                        ], function(err, doc) {
+                        ], function(err, data) {
                             if(err){
                                 console.log("Error encountered.");
                                 res.send(err);
                             }
                             else{
-                                console.log(doc);
-                                res.json(doc);
+                                console.log(data);
+                                res.json(data);
                             }
                         });
                     }
